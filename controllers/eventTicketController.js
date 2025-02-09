@@ -258,7 +258,7 @@ module.exports.cancelBooking = (req, res) => {
 };
 
 module.exports.eventTicketStatus = (req, res) => {
-  const { eventId } = req.body;
+  const { eventId } = req.params;
 
   try {
     if (!eventId) {
