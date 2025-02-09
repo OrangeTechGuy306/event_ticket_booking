@@ -1,5 +1,5 @@
 # EVENT TICKET BOOKING
-A ticket booking system with user authentication, event creation, ticket booking, waiting list management, and cancellation functionality. This system ensures fairness in booking through concurrency handling and provides users with a seamless experience for managing their tickets.
+A ticket booking system with user authentication, event creation, ticket booking, waiting list management, and cancellation functionality through concurrency handling and provides users with available and booked tickets.
 
 # Table of Contents
 1. Project Overview
@@ -18,15 +18,15 @@ A ticket booking system with user authentication, event creation, ticket booking
 This project allows users to:
 1. Register and log in with a JWT-based authentication system.
 2. Create events with a specific number of available tickets.
-3. Book tickets for events, with an automatic waiting list when tickets are sold out.
-4. Cancel event bookings, with automatic reassignment of tickets to the next person in the waiting list.
-5. View event statuses including available tickets and the number of bookings.
+3. Book tickets for events, with an automatic waiting list when tickets are sold out for that event.
+4. Cancel event bookings, with automatic reassignment of tickets to the next person in the waiting list (if any).
+5. View event statuses including available tickets and the number of bookings for a specific event.
 
 # Setup & Installation
 1. clone repository:
    
-		git clone https://github.com/yourusername/event-ticket-booking.git
-		cd event-ticket-booking
+		git clone https://github.com/yourusername/event_ticket_booking.git
+		cd event_ticket_booking
 
 2. Install the dependencies:
 	
@@ -34,115 +34,151 @@ This project allows users to:
 
 3. Set up environment variables: Create a .env file at the root of the project and add the following:
 
-	   	JWT_SECRET=your_jwt_secret_key
-			DB_HOST=your_database_host
-			DB_USER=your_database_user
-			DB_PASS=your_database_password
-			DB_NAME=your_database_name
+	   JWT_SECRET=your_jwt_secret_key
+   	   DB_HOST=your_database_host
+	   DB_USER=your_database_user
+	   DB_PASS=your_database_password
+	   DB_NAME=your_database_name
 
-4. Run the server:
+5. Run the server:
 
        npm start
 
 	
 # API Endpoints
-1. Register a new user: POST /register
+1. POST /register: Register a new user.
 
-	 	Request Body:
-	     {
-			  "username": "user123",
-			  "password": "password123"
-       }
-	Response:
+Request Body:
 
-   		{
-  			"message": "Registration Successful"
-			}
+	   {
+	     "username": "user123",
+	     "password": "password123"
+	   }
+    
+Response:
 
-	2. Log in to an existing account and receive a JWT token: POST /login
+   	{
+  	   "message": "Registration Successful"
+	}
+
+2. POST /login: Log in to an existing account and receive a JWT token.
 
 	    	{
-				  "username": "user123",
-				  "password": "password123"
-				}
-		Response:
+		   "username": "user123",
+		   "password": "password123"
+		}
 
-			{
-			  "token": "your_jwt_token"
-			}
-
-	# Event Ticket Booking
-
-	1. Create a new event with available tickets: POST /initialize
-    . Request Body:
-
-			{
-			  "name": "Concert 2025",
-			  "tickets": 100
-			}
-		Response:
-
-				{
-  				"message": "Event Created"
-				}
-
-		2. POST /book: Book a ticket for an event. If tickets are sold out, the user is added to the waiting list.
-
-			. Request Body:
-
-     			{
-  					"eventId": 1
-					}
-
-			. Response:
-     
-     			{
-  					"message": "Ticket booked"
-					}
-
-		 3. POST /cancel: Cancel a booking for an event.
-
-			. Request Body:
-
-		 			{
-  					"eventId": 1
-   
-					}
-
-		Response: if no user on the waiting list to assign the ticket to.
-
-					{
-  					"message": "Booking canceled, ticket now available to other users"
-					}
-
-		Response: When there is user on the waiting list to assign the ticket to.
-
-
-					{
-  					"message": "Booking canceled, ticket assigned to another user on the waiting list"
-					}
-
-
-	4. GET /status: Check the current status of an event (available tickets and total bookings).
-
-    . Query Parameters
-
-	 			{
-						http://localhost:5000/status/${eventId}
-				}
-
-	Response:
+Response:
 
 		{
-		  "event_name": "Concert 2025",
-		  "available_tickets": 98,
-		  "total_ticket_booked": 2
+		  "token": "your_jwt_token"
 		}
+
+# Event Ticket Booking
+
+1. Create a new event with available tickets: POST /initialize
+. Request Body:
+
+	   {
+		"name": "Concert 2025",
+		"tickets": 100
+	   }
+
+. Headers:
+
+ 	{
+	   "Authorization": "jwt_token"
+	}
+
+Response:
+
+	{
+  	  "message": "Event Created"
+	}
+
+2. POST /book: Book a ticket for an event. If tickets are sold out, the user is added to the waiting list.
+
+. Request Body:
+
+     	{
+  	  "eventId": 1
+	}
+
+ .Headers:
+
+ 	{
+	   "Authorization": "jwt_token"
+	}
+
+. Response:
+     
+     	{
+  	  "message": "Ticket booked"
+	}
+
+3. POST /cancel: Cancel a booking for an event.
+
+. Request Body:
+
+	{
+  	  "eventId": 1
+	}
+
+ . Headers:
+
+ 	{
+	   "Authorization": "jwt_token"
+	}
+
+Response: if no user on the waiting list to assign the ticket to.
+
+	{
+  	  "message": "Booking canceled, ticket now available to other users"
+	}
+ . Headers:
+
+ 	{
+	   "Authorization": "jwt_token"
+	}
+
+Response: When there is user on the waiting list to assign the ticket to.
+
+	{
+  	 "message": "Booking canceled, ticket assigned to another user on the waiting list"
+	}
+
+4. GET /status: Check the current status of an event (available tickets and total bookings).
+
+. Query Parameters
+
+	{
+	    http://localhost:5000/status/${eventId}
+	}
+
+. Headers:
+
+ 	{
+	   "Authorization": "jwt_token"
+	}
+ 
+Response:
+
+	{
+	   "event_name": "Concert 2025",
+	   "available_tickets": 98,
+	   "total_ticket_booked": 2
+	}
 
 
 
 # Concurrency Handling
 The system implements concurrency handling in the ticket booking and cancellation operations. When a user books or cancels a ticket, race conditions are managed by checking the available tickets before processing bookings. If the event is sold out, users are added to the waiting list.
+
+
+# Testing
+I have face a lot of issues while trying to perform unit testing on the code. Which I was not able to debug due to the deadline.
+I hope and I wish that this does not disqualified me from the interview process. 
+The test folder is on the root folder where I am running the test from. Not all the test passed.
 
 
 # Error Handling
