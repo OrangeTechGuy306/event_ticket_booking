@@ -13,6 +13,13 @@ A ticket booking system with user authentication, event creation, ticket booking
 9. Rate Limiting
 10. Design Decisions
 
+
+# NOTE:
+The database file is located in the DB folder inside the root folder. you will have to import it inside XAMPP or MYSQL workbench before running the project.
+Databese file Folder structure:
+
+	root folder > DB > event_ticket_db.sql
+
 # Project Overview
 
 This project allows users to:
